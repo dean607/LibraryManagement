@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}個人面板 - 圖書管理系統{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-user-cog"></i> 個人面板</h2>
+            <div class="btn-group">
+                <a href="{{ url_for('list_books') }}" class="btn btn-primary">
+                    <i class="fas fa-search"></i> 瀏覽圖書
+                </a>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <i class="fas fa-user-edit"></i> 個人資料
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 統計卡片區 -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">目前借閱</h6>
+                        <h3 class="mb-0">{{ borrow_records|length }}</h3>
+                        <small>本圖書</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-book fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">借閱額度</h6>
+                        <h3 class="mb-0">{{ 5 - borrow_records|length }}</h3>
+                        <small>剩餘額度</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-pie fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">累計借閱</h6>
+                        <h3 class="mb-0">{{ total_borrowed_count }}</h3>
+                        <small>本圖書</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-history fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card {% if overdue_count > 0 %}bg-danger{% else %}bg-info{% endif %} text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">逾期圖書</h6>
+                        <h3 class="mb-0">{{ overdue_count }}</h3>
+                        <small>本圖書</small>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 主要內容區 -->
+<div class="row">
+    <!-- 目前借閱 -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list"></i> 目前借閱的圖書</h5>
+                <span class="badge bg-primary">{{ borrow_records|length }}/5</span>
+            </div>
+            <div class="card-body">
+                {% if borrow_records %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>書名</th>
+                                    <th>作者</th>
+                                    <th>借閱日期</th>
+                                    <th>到期日期</th>
+                                    <th>狀態</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in borrow_records %}
+                                <tr {% if record.is_overdue %}class="table-danger"{% elif record.due_soon %}class="table-warning"{% endif %}>
+                                    <td>
+                                        <strong>{{ record.btitle }}</strong>
+                                    </td>
+                                    <td>{{ record.bauthor }}</td>
+                                    <td>{{ record.borrow_date }}</td>
+                                    <td>{{ record.due_date }}</td>
+                                    <td>
+                                        {% if record.is_overdue %}
+                                            <span class="badge bg-danger">已逾期</span>
+                                        {% elif record.due_soon %}
+                                            <span class="badge bg-warning">即將到期</span>
+                                        {% else %}
+                                            <span class="badge bg-success">借閱中</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('return_book', record_id=record.record_id) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" 
+                                                    onclick="return confirm('確定要歸還《{{ record.btitle }}》嗎？')">
+                                                <i class="fas fa-undo"></i> 歸還
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-book-open fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">您目前沒有借閱任何圖書</h5>
+                        <p class="text-muted">開始探索我們豐富的圖書收藏吧！</p>
+                        <a href="{{ url_for('list_books') }}" class="btn btn-primary">
+                            <i class="fas fa-search"></i> 瀏覽圖書
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 個人資訊側邊欄 -->
+    <div class="col-lg-4">
+        <!-- 個人資訊卡片 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user"></i> 個人資訊</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="avatar-circle bg-primary text-white mx-auto mb-2">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                    <h5 class="mb-1">{{ user_info.username | add_stars }}</h5>
+                    <small class="text-muted">會員編號：{{ user_info.mid }}</small>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <strong>{{ total_borrowed_count }}</strong>
+                        <br><small class="text-muted">累計借閱</small>
+                    </div>
+                    <div class="col-6">
+                        <strong>{{ member_days }}</strong>
+                        <br><small class="text-muted">會員天數</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 個人資料編輯模態框 -->
+<div class="modal fade" id="profileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-edit"></i> 編輯個人資料
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('update_profile') }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">用戶名</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   value="{{ user_info.username }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">電子郵件</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ user_info.email }}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">電話號碼</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="{{ user_info.phone }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="birthdate" class="form-label">生日</label>
+                            <input type="date" class="form-control" id="birthdate" name="birthdate" 
+                                   value="{{ user_info.birthdate }}">
+                        </div>
+                    </div>
+                    <hr>
+                    <h6>修改密碼</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="current_password" class="form-label">目前密碼</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="new_password" class="form-label">新密碼</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password">
+                        </div>
+                    </div>
+                    <small class="text-muted">若不需要修改密碼，請留空密碼欄位</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 儲存變更
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<style>
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %}
+{% endblock %}

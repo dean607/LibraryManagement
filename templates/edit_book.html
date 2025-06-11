@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}編輯圖書 - 圖書管理系統{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h4><i class="fas fa-edit"></i> 編輯圖書</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="btitle" class="form-label">
+                                <i class="fas fa-book"></i> 書名 *
+                            </label>
+                            <input type="text" class="form-control" id="btitle" name="btitle" 
+                                   value="{{ book.btitle if book else '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="bauthor" class="form-label">
+                                <i class="fas fa-user"></i> 作者 *
+                            </label>
+                            <input type="text" class="form-control" id="bauthor" name="bauthor" 
+                                   value="{{ book.bauthor if book else '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bpublisher" class="form-label">
+                                <i class="fas fa-building"></i> 出版社
+                            </label>
+                            <input type="text" class="form-control" id="bpublisher" name="bpublisher" 
+                                   value="{{ book.bpublisher if book else '' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="bcategory" class="form-label">
+                                <i class="fas fa-tags"></i> 分類
+                            </label>
+                            <select class="form-select" id="bcategory" name="bcategory">
+                                <option value="">請選擇分類</option>
+                                {% set categories = ['程式設計', '資料科學', '人工智慧', '網頁開發', '資料庫', '文學', '歷史', '科學', '藝術', '其他'] %}
+                                {% for cat in categories %}
+                                    <option value="{{ cat }}" 
+                                            {% if book and book.bcategory == cat %}selected{% endif %}>
+                                        {{ cat }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="bprice" class="form-label">
+                                <i class="fas fa-dollar-sign"></i> 價格 *
+                            </label>
+                            <input type="number" class="form-control" id="bprice" name="bprice" 
+                                   min="0" value="{{ book.bprice if book else '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="bstock" class="form-label">
+                                <i class="fas fa-boxes"></i> 目前庫存 *
+                            </label>
+                            <input type="number" class="form-control" id="bstock" name="bstock" 
+                                   min="0" value="{{ book.bstock if book else '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="total_stock" class="form-label">
+                                <i class="fas fa-warehouse"></i> 總庫存 *
+                            </label>
+                            <input type="number" class="form-control" id="total_stock" name="total_stock" 
+                                   min="0" value="{{ book.total_stock if book else '' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>圖書編號：</strong>{{ book.bid if book else '系統自動生成' }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">* 為必填欄位</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin_books') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> 取消
+                        </a>
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-save"></i> 更新圖書
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

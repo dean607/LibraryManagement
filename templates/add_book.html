@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}新增圖書 - 圖書管理系統{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4><i class="fas fa-plus"></i> 新增圖書</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="btitle" class="form-label">
+                                <i class="fas fa-book"></i> 書名 *
+                            </label>
+                            <input type="text" class="form-control" id="btitle" name="btitle" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="bauthor" class="form-label">
+                                <i class="fas fa-user"></i> 作者 *
+                            </label>
+                            <input type="text" class="form-control" id="bauthor" name="bauthor" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bpublisher" class="form-label">
+                                <i class="fas fa-building"></i> 出版社
+                            </label>
+                            <input type="text" class="form-control" id="bpublisher" name="bpublisher">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="bcategory" class="form-label">
+                                <i class="fas fa-tags"></i> 分類
+                            </label>
+                            <select class="form-select" id="bcategory" name="bcategory">
+                                <option value="">請選擇分類</option>
+                                <option value="程式設計">程式設計</option>
+                                <option value="資料科學">資料科學</option>
+                                <option value="人工智慧">人工智慧</option>
+                                <option value="網頁開發">網頁開發</option>
+                                <option value="資料庫">資料庫</option>
+                                <option value="文學">文學</option>
+                                <option value="歷史">歷史</option>
+                                <option value="科學">科學</option>
+                                <option value="藝術">藝術</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bprice" class="form-label">
+                                <i class="fas fa-dollar-sign"></i> 價格 *
+                            </label>
+                            <input type="number" class="form-control" id="bprice" name="bprice" min="0" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="bstock" class="form-label">
+                                <i class="fas fa-boxes"></i> 庫存數量 *
+                            </label>
+                            <input type="number" class="form-control" id="bstock" name="bstock" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">* 為必填欄位</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin_books') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> 取消
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> 儲存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

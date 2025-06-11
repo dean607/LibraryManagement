@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}圖書管理 - 圖書管理系統{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-book-open"></i> 圖書管理</h2>
+        <a href="{{ url_for('add_book') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> 新增圖書
+        </a>
+    </div>
+</div>
+
+{% if books %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>圖書編號</th>
+                <th>書名</th>
+                <th>作者</th>
+                <th>出版社</th>
+                <th>分類</th>
+                <th>價格</th>
+                <th>庫存</th>
+                <th>總庫存</th>
+                <th style="width: 150px;">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td><code>{{ book.bid }}</code></td>
+                <td>{{ book.btitle }}</td>
+                <td>{{ book.bauthor }}</td>
+                <td>{{ book.bpublisher }}</td>
+                <td><span class="badge bg-secondary">{{ book.bcategory }}</span></td>
+                <td>${{ book.bprice }}</td>
+                <td>
+                    {% if book.bstock > 0 %}
+                        <span class="text-success">{{ book.bstock }}</span>
+                    {% else %}
+                        <span class="text-danger">0</span>
+                    {% endif %}
+                </td>
+                <td>{{ book.total_stock }}</td>
+                <td>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <!-- 編輯按鈕 -->
+                        <a href="{{ url_for('edit_book', bid=book.bid) }}" class="btn btn-info btn-sm" title="編輯">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <!-- 庫存管理按鈕 -->
+                        <button type="button" class="btn btn-warning btn-sm" 
+                                data-bs-toggle="modal" data-bs-target="#stockModal{{ book.bid }}" title="庫存管理">
+                            <i class="fas fa-boxes"></i>
+                        </button>
+                        <!-- 刪除按鈕 -->
+                        <button type="button" class="btn btn-danger btn-sm" 
+                                onclick="confirmDelete('{{ book.bid }}', '{{ book.btitle }}')" title="刪除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- 庫存管理模態框 -->
+            <div class="modal fade" id="stockModal{{ book.bid }}" tabindex="-1" aria-labelledby="stockModalLabel{{ book.bid }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-warning text-white">
+                            <h5 class="modal-title" id="stockModalLabel{{ book.bid }}">
+                                <i class="fas fa-boxes"></i> 庫存管理 - {{ book.btitle }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+                        </div>
+                        <form method="POST" action="{{ url_for('update_stock', bid=book.bid) }}">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">目前庫存</label>
+                                    <input type="number" class="form-control" name="current_stock" value="{{ book.bstock }}" min="0" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">總庫存</label>
+                                    <input type="number" class="form-control" name="total_stock" value="{{ book.total_stock }}" min="0" required>
+                                </div>
+                                <div class="alert alert-info mb-0">
+                                    <small>
+                                        <strong>圖書編號：</strong>{{ book.bid }}<br>
+                                        <strong>借出數量：</strong>{{ book.total_stock - book.bstock }} 本<br>
+                                        <strong>可借數量：</strong>{{ book.bstock }} 本
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> 儲存</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+    <h4 class="text-muted">暫無圖書資料</h4>
+    <p class="text-muted">請先新增圖書</p>
+</div>
+{% endif %}
+
+<!-- 刪除確認模態框 -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteConfirmLabel"><i class="fas fa-exclamation-triangle"></i> 確認刪除</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+      </div>
+      <div class="modal-body">
+        <p>您確定要刪除圖書《<span id="deleteBookTitle"></span>》嗎？</p>
+        <div class="alert alert-danger mb-0">
+          <small><i class="fas fa-exclamation-triangle"></i> 此操作無法復原，請謹慎！</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <form id="deleteForm" method="POST" action="">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> 取消</button>
+          <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> 確認刪除</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(bid, title) {
+    document.getElementById('deleteBookTitle').textContent = title;
+    document.getElementById('deleteForm').action = '/admin/delete_book/' + bid;
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    deleteModal.show();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block title %}管理員面板 - 圖書管理系統{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-tachometer-alt"></i> 管理員面板</h2>
+            <div>
+                <a href="{{ url_for('add_book') }}" class="btn btn-success me-2">
+                    <i class="fas fa-plus"></i> 新增圖書
+                </a>
+                <a href="{{ url_for('admin_books') }}" class="btn btn-primary">
+                    <i class="fas fa-book"></i> 圖書管理
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>總圖書數</h5>
+                        <h2>{{ stats.total_books }}</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-book fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('admin_books') }}" class="text-white text-decoration-none">
+                    查看詳情 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>註冊會員</h5>
+                        <h2>{{ stats.total_members }}</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span class="text-white">會員總數統計</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>借出圖書</h5>
+                        <h2>{{ stats.borrowed_books }}</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-bookmark fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-link text-white p-0 text-decoration-none" 
+                        data-bs-toggle="modal" data-bs-target="#borrowedBooksModal">
+                    查看詳情 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5>逾期圖書</h5>
+                        <h2>{{ stats.overdue_books }}</h2>
+                    </div>
+                    <div>
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-link text-white p-0 text-decoration-none" 
+                        data-bs-toggle="modal" data-bs-target="#overdueModal">
+                    查看詳情 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tasks"></i> 快速操作</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{{ url_for('add_book') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-plus text-success"></i> 新增圖書
+                    </a>
+                    <a href="{{ url_for('admin_books') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-edit text-primary"></i> 管理圖書
+                    </a>
+                    <a href="{{ url_for('admin_borrow_records') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-list-alt text-info"></i> 借閱記錄
+                    </a>
+                    <a href="{{ url_for('list_books') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-search text-warning"></i> 瀏覽圖書
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> 系統狀態</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>圖書借出率</span>
+                        <span>{{ "%.1f"|format((stats.borrowed_books / stats.total_books * 100) if stats.total_books > 0 else 0) }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ (stats.borrowed_books / stats.total_books * 100) if stats.total_books > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>逾期率</span>
+                        <span>{{ "%.1f"|format((stats.overdue_books / stats.borrowed_books * 100) if stats.borrowed_books > 0 else 0) }}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" style="width: {{ (stats.overdue_books / stats.borrowed_books * 100) if stats.borrowed_books > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <small class="text-muted">系統運行正常</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 借出圖書詳情模態框 -->
+<div class="modal fade" id="borrowedBooksModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-bookmark"></i> 借出圖書詳情記錄
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% if borrowed_books %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="borrowedTable">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>借閱編號</th>
+                                <th>書名</th>
+                                <th>作者</th>
+                                <th>借閱者</th>
+                                <th>借閱日期</th>
+                                <th>到期日期</th>
+                                <th>剩餘天數</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in borrowed_books %}
+                            <tr>
+                                <td>{{ record.record_id }}</td>
+                                <td>{{ record.btitle }}</td>
+                                <td>{{ record.bauthor }}</td>
+                                <td>{{ record.username }}</td>
+                                <td>{{ record.borrow_date }}</td>
+                                <td>{{ record.due_date }}</td>
+                                <td>
+                                    {% if record.days_remaining > 0 %}
+                                        <span class="{% if record.days_remaining <= 3 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ record.days_remaining }} 天
+                                        </span>
+                                    {% else %}
+                                        <span class="text-success">今日到期</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if record.days_remaining <= 3 %}
+                                        <span class="badge bg-warning">即將到期</span>
+                                    {% else %}
+                                        <span class="badge bg-success">借閱中</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-info" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#recordDetailModal{{ record.record_id }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-warning" 
+                                                onclick="sendReminder({{ record.record_id }}, '{{ record.username }}')">
+                                            <i class="fas fa-bell"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">目前沒有借出的圖書</h5>
+                    <p class="text-muted">所有圖書都已歸還</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                <a href="{{ url_for('admin_borrow_records') }}?status=borrowed" class="btn btn-warning">
+                    <i class="fas fa-list"></i> 完整借閱記錄
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 逾期圖書詳情模態框 -->
+<div class="modal fade" id="overdueModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> 逾期圖書詳情記錄
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% if overdue_books %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>注意：</strong>共有 {{ overdue_books|length }} 本圖書逾期，總預估罰金 ${{ total_overdue_fine }}
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="overdueTable">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>借閱編號</th>
+                                <th>書名</th>
+                                <th>作者</th>
+                                <th>借閱者</th>
+                                <th>借閱日期</th>
+                                <th>到期日期</th>
+                                <th>逾期天數</th>
+                                <th>預估罰金</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in overdue_books %}
+                            <tr>
+                                <td>{{ record.record_id }}</td>
+                                <td>{{ record.btitle }}</td>
+                                <td>{{ record.bauthor }}</td>
+                                <td>{{ record.username }}</td>
+                                <td>{{ record.borrow_date }}</td>
+                                <td>{{ record.due_date }}</td>
+                                <td>
+                                    <span class="fw-bold text-danger">{{ record.overdue_days }} 天</span>
+                                </td>
+                                <td>
+                                    <span class="text-danger fw-bold">${{ record.overdue_days * 5 }}</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-info" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#recordDetailModal{{ record.record_id }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger" 
+                                                onclick="sendUrgentReminder({{ record.record_id }}, '{{ record.username }}', {{ record.overdue_days }})">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h5 class="text-success">太棒了！目前沒有逾期的圖書</h5>
+                    <p class="text-muted">所有借閱者都按時歸還圖書</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                <a href="{{ url_for('admin_borrow_records') }}?status=overdue" class="btn btn-danger">
+                    <i class="fas fa-list"></i> 完整逾期記錄
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+function sendReminder(recordId, username) {
+    if (confirm(`確定要向 ${username} 發送歸還提醒嗎？`)) {
+        alert('提醒已發送！');
+    }
+}
+
+function sendUrgentReminder(recordId, username, overdueDays) {
+    if (confirm(`${username} 已逾期 ${overdueDays} 天，確定發送緊急催還通知嗎？`)) {
+        alert('緊急催還通知已發送！');
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

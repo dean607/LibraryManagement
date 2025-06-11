@@ -1,0 +1,45 @@
+/* 自定義樣式 */
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn {
+    border-radius: 6px;
+}
+
+.table th {
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* 狀態顏色 */
+.status-borrowed {
+    color: #28a745;
+}
+
+.status-overdue {
+    color: #dc3545;
+}
+
+.status-returned {
+    color: #6c757d;
+}

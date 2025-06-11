@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="jumbotron bg-white p-5 rounded shadow-sm">
+            <div class="text-center">
+                <i class="fas fa-book-reader fa-4x text-primary mb-4"></i>
+                <h1 class="display-4">歡迎使用圖書管理系統</h1>
+                <p class="lead">一個功能完整的現代化圖書管理解決方案</p>
+            </div>
+            
+            {% if not session.user_id %}
+                <hr class="my-4">
+                <div class="text-center">
+                    <p class="mb-4">請先登入或註冊以使用系統功能</p>
+                    <a class="btn btn-primary btn-lg me-3" href="{{ url_for('login') }}">
+                        <i class="fas fa-sign-in-alt"></i> 立即登入
+                    </a>
+                    <a class="btn btn-outline-primary btn-lg" href="{{ url_for('register') }}">
+                        <i class="fas fa-user-plus"></i> 註冊帳號
+                    </a>
+                </div>
+            {% else %}
+                <hr class="my-4">
+                <div class="text-center">
+                    <p class="mb-4">您已登入系統，可以開始使用各項功能</p>
+                    <a class="btn btn-success btn-lg me-3" href="{{ url_for('list_books') }}">
+                        <i class="fas fa-search"></i> 瀏覽圖書
+                    </a>
+                    {% if session.user_type == 'admin' %}
+                        <a class="btn btn-warning btn-lg" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> 管理面板
+                        </a>
+                    {% else %}
+                        <a class="btn btn-info btn-lg" href="{{ url_for('user_dashboard') }}">
+                            <i class="fas fa-user-cog"></i> 個人面板
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">圖書管理</h5>
+                <p class="card-text">完整的圖書資訊管理、分類查詢功能，支援多種搜尋方式</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-3x text-success mb-3"></i>
+                <h5 class="card-title">會員系統</h5>
+                <p class="card-text">用戶註冊登入、個人資料管理，安全的權限控制機制</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-exchange-alt fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">借還書系統</h5>
+                <p class="card-text">便捷的借書還書功能、逾期管理、自動計算罰金</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> 系統特色</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> 響應式網頁設計</li>
+                            <li><i class="fas fa-check text-success"></i> 多層級權限管理</li>
+                            <li><i class="fas fa-check text-success"></i> 自動逾期提醒</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> 庫存自動管理</li>
+                            <li><i class="fas fa-check text-success"></i> 詳細記錄追蹤</li>
+                            <li><i class="fas fa-check text-success"></i> 友善操作介面</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

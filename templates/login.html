@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}登入 - 圖書管理系統{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="fas fa-sign-in-alt"></i> 會員登入</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> 電子郵件
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> 密碼
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> 登入
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">還沒有帳號？ 
+                    <a href="{{ url_for('register') }}" class="text-decoration-none">
+                        立即註冊
+                    </a>
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">測試帳號</h6>
+                <p class="card-text small">
+                    <strong>管理員：</strong><br>
+                    Email: admin@library.com<br>
+                    Password: admin123
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
